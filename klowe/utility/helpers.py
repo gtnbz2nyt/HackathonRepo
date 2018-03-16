@@ -21,3 +21,12 @@ def readAuthConfig(configFile, profilename):
     except:
         print("Unexpected error:", sys.exc_info()[0])
         raise
+
+def getArgs(argv=None):
+    import argparse
+    parser = argparse.ArgumentParser(description="Hack stuff.")
+    parser.add_argument('--credentials', '-C', default="credentials.ini", help='Location of credential file')
+    parser.add_argument('--profile', '-P', default="default", help='Profile to use')
+    options = parser.parse_args()
+
+    return parser.parse_args(argv)
