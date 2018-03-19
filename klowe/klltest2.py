@@ -2,6 +2,7 @@
 
 from utility.helpers import getArgs
 from utility.helpers import kairosAuthConfig
+import json
 import kairos_face
 
 
@@ -44,8 +45,6 @@ galleries_list = kairos_face.get_galleries_names_list()
 
 image_file=getImage()
 
-# kairos_face.enroll_face(file=image_file, subject_id='subject1', gallery_name='a-gallery')
+foo = kairos_face.enroll_face(file=image_file, subject_id='subject1', gallery_name='a-gallery')
+print(json.dumps(foo, indent=4))
 
-for item in galleries_list:
-    print(type(item))
-    print(item)
