@@ -1,1 +1,5 @@
 credentials.ini
+*.pyc
+utility/__init__.pyc
+utility/__pycache__/
+utility/helpers.pyc
