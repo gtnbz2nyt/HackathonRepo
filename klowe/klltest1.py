@@ -8,7 +8,7 @@ from utility.helpers import readAuthConfig
 
 parser = argparse.ArgumentParser(description='Hack stuff.')
 parser.add_argument('--credentials', '-C', default="credentials.ini", help='Location of credential file')
-parser.add_argument('--profile', '-P', default="default", help='Profile to use')
+parser.add_argument('--profile', '-P', default="db0", help='Profile to use')
 options = parser.parse_args()
 
 credentials = options.credentials
