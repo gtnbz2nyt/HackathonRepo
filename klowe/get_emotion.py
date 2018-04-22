@@ -3,7 +3,7 @@ import os, sys
 
 from cloudinary.uploader import upload
 from cloudinary.utils import cloudinary_url
-from cloudinary.api import delete_resources_by_tag, resources_by_tag
+from cloudinary.api import delete_resources_by_tag, resources_by_tag, update
 from pandas.io.json import json_normalize
 import pprint
 import json
@@ -17,23 +17,28 @@ if os.path.exists('settings.py'):
 DEFAULT_TAG = "python_sample_basic"
 
 def get_info_from_json(data):
-    import pandas as pd
-    dat1 = json_normalize(data)
-    dat2 = json_normalize(dat1['info.detection.adv_face.data'][0])
-    cols_to_keep = ['attributes.age', 'attributes.gender',
-           'attributes.emotion.anger', 'attributes.emotion.contempt',
-           'attributes.emotion.disgust', 'attributes.emotion.fear',
-           'attributes.emotion.happiness', 'attributes.emotion.neutral',
-           'attributes.emotion.sadness', 'attributes.emotion.surprise']
-    dat3 = dat2[cols_to_keep]
-    dat3.columns = [x.split('.')[-1] for x in list(dat3.columns.values)]
-    dat3['tmp']='1'
-    cols_to_keep_2 = ['created_at','etag','public_id','signature']
-    dat1 = dat1[cols_to_keep_2]
-    dat1['tmp'] = '1'
-    DF = pd.merge(dat3, dat1, on=['tmp'])
-    DF.drop('tmp', axis=1)
-    return DF
+   import pandas as pd
+   try:
+       data['info']['detection']['adv_face']['data']
+       dat1 = json_normalize(data)
+       dat2 = json_normalize(dat1['info.detection.adv_face.data'][0])
+       cols_to_keep = ['attributes.age', 'attributes.gender',
+          'attributes.emotion.anger', 'attributes.emotion.contempt',
+          'attributes.emotion.disgust', 'attributes.emotion.fear',
+          'attributes.emotion.happiness', 'attributes.emotion.neutral',
+          'attributes.emotion.sadness', 'attributes.emotion.surprise']
+       dat3 = dat2[cols_to_keep]
+       dat3.columns = [x.split('.')[-1] for x in list(dat3.columns.values)]
+       dat3['tmp']='1'
+       cols_to_keep_2 = ['created_at','public_id']
+       dat1 = dat1[cols_to_keep_2]
+       dat1['tmp'] = '1'
+       DF = pd.merge(dat3, dat1, on=['tmp'])
+       DF.drop('tmp', axis=1)
+       return DF
+   except Exception:
+       pass
+
 
 def dump_response(response):
     for key in sorted(response.keys()):
@@ -64,13 +69,25 @@ def cleanup():
     pass
 
 def getemotion():
-    response = resources_by_tag(DEFAULT_TAG, max_results=500)
+    payload = []
+    response = resources_by_tag(DEFAULT_TAG, max_results=10)
+    # print(response)
     resources = response.get('resources', [])
-    print(resources)
+    
     if not resources:
         print("No images found")
         return
     pass
+    for item in resources:
+        # print(item["public_id"])
+        face = update(item["public_id"], detection="adv_face")
+        # print("face:", type(face))
+        # print(face["info"])
+        # print(get_info_from_json(face))
+        dbrow = get_info_from_json(face)
+        # print(dbrow)
+        payload.append(dbrow)
+    print(payload) 
 
 
 if len(sys.argv) > 1:
